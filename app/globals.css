@@ -4,6 +4,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Tossface 이모지 폰트 */
+.font-tossface {
+  font-family: 'Outfit', 'Tossface', sans-serif;
+}
+
 @layer base {
   :root {
     /* Tailwind Indigo/Slate Palette */
