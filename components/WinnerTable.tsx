@@ -75,7 +75,7 @@ export default function WinnerTable({ winners, onStatusChange, onDelete, onCopyL
                           </span>
                         )}
                         {wp.product?.agency && (
-                          <span className="text-xs text-rose-500 bg-rose-50 px-2 py-0.5 rounded">
+                          <span className="text-xs text-slate-500 bg-slate-50 px-2 py-0.5 rounded">
                             {wp.product.agency}
                           </span>
                         )}
@@ -117,7 +117,7 @@ export default function WinnerTable({ winners, onStatusChange, onDelete, onCopyL
                     </button>
                     <button
                       onClick={() => onCopyLink(winner.form_token)}
-                      className="text-rose-400 hover:text-rose-500"
+                      className="text-slate-400 hover:text-slate-500"
                       title="주소 입력 링크 복사"
                     >
                       링크복사

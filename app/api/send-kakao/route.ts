@@ -9,7 +9,11 @@ export async function POST(request: NextRequest) {
     const userId = process.env.ALIGO_USER_ID;
     const sender = process.env.ALIGO_SENDER;
     const channelKey = process.env.ALIGO_KAKAO_CHANNEL_KEY;
-    const templateCode = process.env.ALIGO_KAKAO_TEMPLATE_CODE;
+
+    // 과세/비과세에 따른 템플릿 코드 선택
+    const templateCode = hasTaxable
+      ? process.env.ALIGO_KAKAO_TEMPLATE_CODE_TAXABLE
+      : process.env.ALIGO_KAKAO_TEMPLATE_CODE_DEFAULT;
 
     if (!apiKey || !userId || !sender || apiKey === 'your_api_key_here') {
       return NextResponse.json(
@@ -31,12 +35,9 @@ export async function POST(request: NextRequest) {
     formData.append('receiver_1', cleanPhone);
     formData.append('subject_1', 'MBC 여성시대 당첨 안내');
 
-    // 템플릿 변수 (알리고에서 템플릿 등록 시 설정한 변수명에 맞춰 수정 필요)
-    const taxableNotice = hasTaxable
-      ? '\n※ 과세 상품이 포함되어 있어 주민등록번호 입력이 필요합니다.'
-      : '';
-
-    const message = `[MBC라디오 여성시대]
+    // 과세/비과세에 따른 메시지 내용
+    const message = hasTaxable
+      ? `[MBC라디오 여성시대]
 
 ${name}님, 축하합니다!
 이벤트에 당첨되셨습니다.
@@ -46,7 +47,20 @@ ${name}님, 축하합니다!
 
 상품 수령을 위해 아래 링크에서 정보를 입력해주세요.
 ${formUrl}
-${taxableNotice}
+
+※ 과세 상품이 포함되어 있어 본인인증 및 주민등록번호 입력이 필요합니다.
+※ 3개월 이내 미입력 시 당첨이 취소될 수 있습니다.`
+      : `[MBC라디오 여성시대]
+
+${name}님, 축하합니다!
+이벤트에 당첨되셨습니다.
+
+▶ 당첨 상품: ${productNames}
+▶ 고유번호: ${uniqueCode}
+
+상품 수령을 위해 아래 링크에서 정보를 입력해주세요.
+${formUrl}
+
 ※ 3개월 이내 미입력 시 당첨이 취소될 수 있습니다.`;
 
     formData.append('message_1', message);
@@ -76,7 +90,12 @@ ${taxableNotice}
       smsFormData.append('user_id', userId);
       smsFormData.append('sender', sender);
       smsFormData.append('receiver', cleanPhone);
-      smsFormData.append('msg', `[MBC 여성시대] ${name}님 당첨 축하드립니다! 고유번호: ${uniqueCode} / 정보입력: ${formUrl}`);
+
+      const smsMessage = hasTaxable
+        ? `[MBC 여성시대] ${name}님 당첨 축하드립니다! 고유번호: ${uniqueCode} / 정보입력: ${formUrl} (과세상품 포함 - 본인인증 필요)`
+        : `[MBC 여성시대] ${name}님 당첨 축하드립니다! 고유번호: ${uniqueCode} / 정보입력: ${formUrl}`;
+
+      smsFormData.append('msg', smsMessage);
       smsFormData.append('msg_type', 'LMS');
 
       const smsResponse = await fetch('https://apis.aligo.in/send/', {

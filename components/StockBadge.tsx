@@ -3,19 +3,29 @@ type StockBadgeProps = {
 };
 
 export default function StockBadge({ stock }: StockBadgeProps) {
-  let colorClass = 'bg-green-100 text-green-800';
-
   if (stock === 0) {
-    colorClass = 'bg-red-100 text-red-800';
-  } else if (stock <= 5) {
-    colorClass = 'bg-yellow-100 text-yellow-800';
+    return (
+      <span className="badge badge-danger">
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-danger opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-danger"></span>
+        </span>
+        품절
+      </span>
+    );
+  }
+
+  if (stock <= 5) {
+    return (
+      <span className="badge badge-warning">
+        재고 부족 ({stock})
+      </span>
+    );
   }
 
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${colorClass}`}>
-      재고: {stock}개
-      {stock === 0 && ' (품절)'}
-      {stock > 0 && stock <= 5 && ' (부족)'}
+    <span className="badge badge-success">
+      재고 {stock}개
     </span>
   );
 }

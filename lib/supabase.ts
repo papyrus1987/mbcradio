@@ -10,7 +10,11 @@ export type Product = {
   name: string;
   stock: number;
   agency: string | null;
-  taxable: boolean;
+  price: number;
+  taxable?: boolean;
+  status?: string;
+  incoming?: number;
+  transfer?: number;
   created_at: string;
 };
 
@@ -32,6 +36,7 @@ export type Winner = {
   status: '대기' | '발송완료';
   created_at: string;
   address_submitted: boolean;
+  phone_verified: boolean;
   form_token: string;
   broadcast_date: string;
   winner_products?: WinnerProduct[];
