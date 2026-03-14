@@ -30,6 +30,7 @@ export default function WinnersClient({
   const [isPending, startTransition] = useTransition();
   const [winners, setWinners] = useState<Winner[]>(initialWinners);
   const [sendingKakaoId, setSendingKakaoId] = useState<string | null>(null);
+  const [sendingSmsId, setSendingSmsId] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState(false);
 
   const totalPages = Math.ceil(totalCount / pageSize);
@@ -171,6 +172,47 @@ export default function WinnersClient({
       alert('발송 중 오류가 발생했습니다.');
     } finally {
       setSendingKakaoId(null);
+    }
+  }
+
+  async function handleSendSms(winner: Winner) {
+    if (!confirm(`${winner.name}님에게 SMS 문자를 발송하시겠습니까?`)) return;
+
+    setSendingSmsId(winner.id);
+
+    const formUrl = `${window.location.origin}/form/${winner.form_token}`;
+    const productNames = winner.winner_products
+      ?.map(wp => wp.product?.name)
+      .filter(Boolean)
+      .join(', ') || '상품';
+    const hasTaxable = winner.winner_products?.some(wp => wp.product?.taxable) || false;
+
+    try {
+      const response = await fetch('/api/send-sms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: winner.phone,
+          name: winner.name,
+          formUrl,
+          productNames,
+          uniqueCode: winner.unique_code,
+          hasTaxable,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert(result.message);
+      } else {
+        alert(`발송 실패: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Error sending SMS:', error);
+      alert('발송 중 오류가 발생했습니다.');
+    } finally {
+      setSendingSmsId(null);
     }
   }
 
@@ -380,6 +422,18 @@ export default function WinnersClient({
                           title="링크 복사"
                         >
                           🔗
+                        </button>
+                        <button
+                          onClick={() => handleSendSms(winner)}
+                          disabled={sendingSmsId === winner.id}
+                          className="w-9 h-9 rounded-xl flex items-center justify-center text-gray-400 hover:text-blue-500 hover:bg-blue-50 transition-all disabled:opacity-50"
+                          title="SMS 문자 발송"
+                        >
+                          {sendingSmsId === winner.id ? (
+                            <span className="spinner w-4 h-4"></span>
+                          ) : (
+                            '📱'
+                          )}
                         </button>
                         <button
                           onClick={() => handleSendKakao(winner)}

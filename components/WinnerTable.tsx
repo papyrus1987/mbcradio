@@ -8,10 +8,12 @@ type WinnerTableProps = {
   onDelete: (id: string) => void;
   onCopyLink: (token: string) => void;
   onSendKakao: (winner: Winner) => void;
+  onSendSms: (winner: Winner) => void;
   sendingKakaoId: string | null;
+  sendingSmsId: string | null;
 };
 
-export default function WinnerTable({ winners, onStatusChange, onDelete, onCopyLink, onSendKakao, sendingKakaoId }: WinnerTableProps) {
+export default function WinnerTable({ winners, onStatusChange, onDelete, onCopyLink, onSendKakao, onSendSms, sendingKakaoId, sendingSmsId }: WinnerTableProps) {
   return (
     <div className="overflow-x-auto bg-white rounded-lg shadow">
       <table className="min-w-full divide-y divide-gray-200">
@@ -107,6 +109,14 @@ export default function WinnerTable({ winners, onStatusChange, onDelete, onCopyL
               <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
                 {!winner.address_submitted && (
                   <>
+                    <button
+                      onClick={() => onSendSms(winner)}
+                      disabled={sendingSmsId === winner.id}
+                      className="text-blue-500 hover:text-blue-600 disabled:text-blue-300"
+                      title="SMS 문자 발송"
+                    >
+                      {sendingSmsId === winner.id ? '발송중...' : '문자발송'}
+                    </button>
                     <button
                       onClick={() => onSendKakao(winner)}
                       disabled={sendingKakaoId === winner.id}
