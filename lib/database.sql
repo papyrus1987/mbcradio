@@ -17,9 +17,11 @@ CREATE TABLE winners (
   name TEXT NOT NULL,
   phone TEXT NOT NULL,
   address TEXT,
+  resident_id TEXT,
   status TEXT NOT NULL DEFAULT '대기' CHECK (status IN ('대기', '발송완료')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   address_submitted BOOLEAN DEFAULT FALSE,
+  phone_verified BOOLEAN DEFAULT FALSE,
   form_token TEXT UNIQUE DEFAULT encode(gen_random_bytes(16), 'hex'),
   broadcast_date DATE NOT NULL
 );
