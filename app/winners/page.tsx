@@ -2,6 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 import { Winner } from '@/lib/supabase';
 import WinnersClient from './WinnersClient';
 
+export const dynamic = 'force-dynamic';
+
 const PAGE_SIZE = 20;
 
 type SearchParams = Promise<{ filter?: string; page?: string }>;
