@@ -85,6 +85,7 @@ export default function NewWinnerPage() {
       address_submitted: addressMode === 'direct',
       broadcast_date: formData.get('broadcast_date') as string,
       unique_code: uniqueCode,
+      form_token: crypto.randomUUID(),
     };
 
     const { data: winnerData, error: winnerError } = await supabase
