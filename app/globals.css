@@ -468,6 +468,15 @@
                 0 16px 48px rgba(26, 24, 22, 0.15);
   }
 
+  .action-card-dark h1,
+  .action-card-dark h2,
+  .action-card-dark h3,
+  .action-card-dark h4,
+  .action-card-dark h5,
+  .action-card-dark h6 {
+    color: white;
+  }
+
   .action-card-dark:hover {
     box-shadow: 0 12px 32px rgba(26, 24, 22, 0.4),
                 0 24px 64px rgba(26, 24, 22, 0.2);
