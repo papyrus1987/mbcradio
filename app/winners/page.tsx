@@ -8,7 +8,7 @@ const PAGE_SIZE = 20;
 
 type SearchParams = Promise<{ filter?: string; page?: string }>;
 
-async function getWinnersData(filter: 'all' | '대기' | '발송완료', page: number) {
+async function getWinnersData(filter: 'all' | '대기' | '발송완료' | '미입력', page: number) {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -17,10 +17,11 @@ async function getWinnersData(filter: 'all' | '대기' | '발송완료', page: n
   const offset = (page - 1) * PAGE_SIZE;
 
   // 필터 카운트를 병렬로 가져오기
-  const [allCountResult, pendingCountResult, completedCountResult] = await Promise.all([
+  const [allCountResult, pendingCountResult, completedCountResult, addressPendingResult] = await Promise.all([
     supabase.from('winners').select('*', { count: 'exact', head: true }),
     supabase.from('winners').select('*', { count: 'exact', head: true }).eq('status', '대기'),
     supabase.from('winners').select('*', { count: 'exact', head: true }).eq('status', '발송완료'),
+    supabase.from('winners').select('*', { count: 'exact', head: true }).eq('address_submitted', false),
   ]);
 
   // 현재 필터에 맞는 데이터 가져오기 (페이지네이션 적용)
@@ -37,7 +38,9 @@ async function getWinnersData(filter: 'all' | '대기' | '발송완료', page: n
     .order('created_at', { ascending: false })
     .range(offset, offset + PAGE_SIZE - 1);
 
-  if (filter !== 'all') {
+  if (filter === '미입력') {
+    query = query.eq('address_submitted', false);
+  } else if (filter !== 'all') {
     query = query.eq('status', filter);
   }
 
@@ -54,6 +57,8 @@ async function getWinnersData(filter: 'all' | '대기' | '발송완료', page: n
     totalCount = pendingCountResult.count || 0;
   } else if (filter === '발송완료') {
     totalCount = completedCountResult.count || 0;
+  } else if (filter === '미입력') {
+    totalCount = addressPendingResult.count || 0;
   }
 
   return {
@@ -63,13 +68,14 @@ async function getWinnersData(filter: 'all' | '대기' | '발송완료', page: n
       all: allCountResult.count || 0,
       pending: pendingCountResult.count || 0,
       completed: completedCountResult.count || 0,
+      addressPending: addressPendingResult.count || 0,
     },
   };
 }
 
 export default async function WinnersPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
-  const filter = (params.filter as 'all' | '대기' | '발송완료') || 'all';
+  const filter = (params.filter as 'all' | '대기' | '발송완료' | '미입력') || 'all';
   const page = parseInt(params.page || '1', 10);
 
   const data = await getWinnersData(filter, page);

@@ -182,13 +182,19 @@ export default async function DashboardPage() {
           <p className="text-4xl font-extrabold text-danger mb-1">{stats.addressPendingCount}</p>
           <p className="text-sm text-gray-500 font-medium">주소 미입력</p>
           {stats.addressPendingCount > 0 && (
-            <div className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-danger">
+            <Link
+              href="/winners?filter=미입력"
+              className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-danger hover:text-danger-dark transition-colors group-hover:gap-3"
+            >
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-danger opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-danger"></span>
               </span>
-              확인 필요
-            </div>
+              확인하기
+              <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
           )}
         </div>
       </div>

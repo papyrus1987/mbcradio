@@ -10,11 +10,12 @@ type Props = {
   totalCount: number;
   initialPage: number;
   pageSize: number;
-  initialFilter: 'all' | '대기' | '발송완료';
+  initialFilter: 'all' | '대기' | '발송완료' | '미입력';
   filterCounts: {
     all: number;
     pending: number;
     completed: number;
+    addressPending: number;
   };
 };
 
@@ -35,7 +36,7 @@ export default function WinnersClient({
 
   const totalPages = Math.ceil(totalCount / pageSize);
 
-  function handleFilterChange(newFilter: 'all' | '대기' | '발송완료') {
+  function handleFilterChange(newFilter: 'all' | '대기' | '발송완료' | '미입력') {
     startTransition(() => {
       router.push(`/winners?filter=${newFilter}&page=1`);
     });
@@ -334,6 +335,14 @@ export default function WinnersClient({
           style={initialFilter === '발송완료' ? { background: 'linear-gradient(135deg, #06d6a0, #059669)' } : {}}
         >
           완료 <span className="ml-1.5 opacity-70">{filterCounts.completed}</span>
+        </button>
+        <button
+          onClick={() => handleFilterChange('미입력')}
+          disabled={isPending}
+          className={`tab ${initialFilter === '미입력' ? 'tab-active' : ''}`}
+          style={initialFilter === '미입력' ? { background: 'linear-gradient(135deg, #ef4444, #dc2626)' } : {}}
+        >
+          미입력 <span className="ml-1.5 opacity-70">{filterCounts.addressPending}</span>
         </button>
       </div>
 
